@@ -56,7 +56,7 @@ struct ClipboardPanelView: View {
                     .font(.system(size: 28, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white.opacity(0.96))
 
-                Text("AquaPaste · Option + V để mở. Dùng ↑ ↓ để chọn và Enter để dán ngay.")
+                Text(L("AquaPaste · Press Option + V to open. Use ↑ ↓ to select and Enter to paste.", "AquaPaste · Option + V để mở. Dùng ↑ ↓ để chọn và Enter để dán ngay."))
                     .font(.system(size: 13, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.72))
             }
@@ -65,12 +65,12 @@ struct ClipboardPanelView: View {
 
             if viewModel.canAutoPaste == false {
                 GlassCapsuleLabel(
-                    text: "Cần bật Accessibility để tự dán",
+                    text: L("Enable Accessibility to auto-paste", "Cần bật Accessibility để tự dán"),
                     tint: Color.orange.opacity(0.85)
                 )
             } else {
                 GlassCapsuleLabel(
-                    text: "Tự dán đang sẵn sàng",
+                    text: L("Auto-paste ready", "Tự dán đang sẵn sàng"),
                     tint: Color.green.opacity(0.80)
                 )
             }
@@ -82,7 +82,7 @@ struct ClipboardPanelView: View {
             Image(systemName: "magnifyingglass")
                 .foregroundStyle(.white.opacity(0.72))
 
-            TextField("Tìm trong lịch sử clipboard...", text: $viewModel.searchText)
+            TextField(L("Search clipboard history...", "Tìm trong lịch sử clipboard..."), text: $viewModel.searchText)
                 .textFieldStyle(.plain)
                 .focused($isSearchFocused)
                 .foregroundStyle(.white.opacity(0.94))
@@ -112,10 +112,10 @@ struct ClipboardPanelView: View {
                 Image(systemName: "sparkles.rectangle.stack")
                     .font(.system(size: 30))
                     .foregroundStyle(.white.opacity(0.75))
-                Text("Chưa có dữ liệu phù hợp")
+                Text(L("No matching items", "Chưa có dữ liệu phù hợp"))
                     .font(.system(size: 16, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.82))
-                Text("Hãy copy thêm văn bản hoặc hình ảnh để xây dựng lịch sử.")
+                Text(L("Copy some text or images to build your history.", "Hãy copy thêm văn bản hoặc hình ảnh để xây dựng lịch sử."))
                     .font(.system(size: 13, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.56))
             }
@@ -152,13 +152,13 @@ struct ClipboardPanelView: View {
 
     private var footer: some View {
         HStack(spacing: 12) {
-            Button("Đóng") {
+            Button(L("Close", "Đóng")) {
                 onClose()
             }
             .keyboardShortcut(.cancelAction)
             .buttonStyle(GlassActionButtonStyle(tint: .white.opacity(0.14)))
 
-            Button("Xóa lịch sử", role: .destructive) {
+            Button(L("Clear History", "Xóa lịch sử"), role: .destructive) {
                 viewModel.store.clear()
                 viewModel.syncSelection()
             }
@@ -167,10 +167,10 @@ struct ClipboardPanelView: View {
             Spacer()
 
             VStack(alignment: .trailing, spacing: 4) {
-                Text("Đang có \(viewModel.store.items.count) / \(viewModel.store.maxItems) mục")
+                Text(L("\(viewModel.store.items.count) / \(viewModel.store.maxItems) items", "Đang có \(viewModel.store.items.count) / \(viewModel.store.maxItems) mục"))
                     .font(.system(size: 12, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white.opacity(0.82))
-                Text("Lịch sử được lưu lại sau khi đóng app")
+                Text(L("History is saved after you close the app", "Lịch sử được lưu lại sau khi đóng app"))
                     .font(.system(size: 11, weight: .medium, design: .rounded))
                     .foregroundStyle(.white.opacity(0.56))
             }

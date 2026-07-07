@@ -1,89 +1,94 @@
 # AquaPaste
 
-**Win + V cho MacBook.** AquaPaste là app macOS nhỏ gọn, miễn phí, mô phỏng tính năng **Clipboard History (Lịch sử bảng tạm)** quen thuộc trên Windows. Thay vì chỉ dán được nội dung sao chép cuối cùng, bạn xem lại và dán bất kỳ thứ gì đã copy trước đó (văn bản và hình ảnh).
+**Read this in other languages: [Tiếng Việt](README.vi.md)**
 
-Mở bảng lịch sử bằng phím tắt **`Option + V`**.
+**Win + V for your Mac.** AquaPaste is a small, free macOS app that brings the familiar **Clipboard History** feature from Windows to macOS. Instead of only pasting the last thing you copied, you can browse and paste anything you copied earlier (both text and images).
 
-> App do Vi Tiến Hoàng (hoang.com.vn) tự viết cho nhu cầu cá nhân rồi chia sẻ miễn phí. Mã nguồn mở, dùng thoải mái.
+Open the history panel with **`Option + V`**.
 
-## Tính năng
+> Written by Vi Tiến Hoàng (hoang.com.vn) for personal use, then shared for free. Open source, use it however you like.
 
-- Theo dõi mọi thứ bạn copy: **văn bản** và **hình ảnh**.
-- Mở panel lịch sử bằng `Option + V`, ở bất kỳ app nào.
-- Điều hướng bằng bàn phím: `↑` `↓` để chọn, `Enter` để dán, `Esc` để đóng.
-- Chọn một mục sẽ **tự copy lại và tự dán** vào app đang làm việc (khi đã cấp quyền Accessibility).
-- Giao diện **Liquid Glass** kính mờ nhiều lớp theo đúng ngôn ngữ thiết kế của macOS.
-- Icon trên **menu bar** để mở nhanh, xóa lịch sử, hoặc thoát app.
-- **Lưu bền vững**: giữ 50 mục gần nhất, còn nguyên sau khi tắt máy.
-- Nhẹ (~550 KB), chạy nền, không thu thập dữ liệu, không gửi gì lên mạng.
+The interface is **English by default** and automatically switches to **Vietnamese** on systems set to Vietnamese.
 
-Yêu cầu: **macOS 13 trở lên** (Ventura, Sonoma, Sequoia, Tahoe...), cả máy Apple Silicon.
+## Features
 
-## Cách cài (bản chạy ngay)
+- Tracks everything you copy: **text** and **images**.
+- Open the history panel with `Option + V`, from any app.
+- Keyboard navigation: `↑` `↓` to select, `Enter` to paste, `Esc` to close.
+- Selecting an item **copies it back and auto-pastes** into the app you were working in (once you grant Accessibility permission).
+- A layered **Liquid Glass** frosted interface that matches macOS design.
+- A **menu bar** icon for quick open, clearing history, or quitting.
+- **Persistent storage**: keeps the 50 most recent items, kept after you restart.
+- Lightweight (~550 KB), runs in the background, collects no data, sends nothing over the network.
 
-1. Tải file `AquaPaste.zip` về, giải nén sẽ ra **`AquaPaste.app`**.
-2. Kéo `AquaPaste.app` vào thư mục **Applications**.
-3. **Lần đầu mở:** vì app chưa mua chứng chỉ nhà phát triển của Apple, macOS sẽ chặn. Bạn **bấm chuột phải vào `AquaPaste.app` → chọn `Open` → bấm `Open` lần nữa**. Chỉ cần làm một lần duy nhất.
-   - Nếu vẫn báo "app bị hỏng / không mở được", mở **Terminal** và chạy:
+Requirements: **macOS 13 or later** (Ventura, Sonoma, Sequoia, Tahoe...), Apple Silicon supported.
+
+## Install (ready-to-run build)
+
+1. Download `AquaPaste.zip` from the [latest release](https://github.com/hoangvttyphu/aquapaste/releases/latest) and unzip it to get **`AquaPaste.app`**.
+2. Drag `AquaPaste.app` into your **Applications** folder.
+3. **First launch:** because the app is not signed with an Apple developer certificate, macOS will block it. **Right-click `AquaPaste.app` → choose `Open` → click `Open` again.** You only need to do this once.
+   - If it still says "app is damaged / can't be opened", open **Terminal** and run:
      ```bash
      xattr -cr /Applications/AquaPaste.app
      ```
-     rồi mở lại app.
-4. App chạy nền, hiện icon bảng tạm trên **menu bar** (góc phải trên màn hình). Không có cửa sổ chính.
+     then open the app again.
+4. The app runs in the background and shows a clipboard icon in the **menu bar** (top-right of the screen). There is no main window.
 
-## Cấp quyền để tự dán
+## Grant permission for auto-paste
 
-Để AquaPaste tự bấm `Cmd + V` giúp bạn sau khi chọn một mục, macOS cần quyền Accessibility:
+To let AquaPaste press `Cmd + V` for you after you pick an item, macOS needs Accessibility permission:
 
-**System Settings → Privacy & Security → Accessibility → bật công tắc cho AquaPaste.**
+**System Settings → Privacy & Security → Accessibility → enable the toggle for AquaPaste.**
 
-Nếu chưa cấp quyền, app vẫn hoạt động: nó copy nội dung bạn chọn vào clipboard, bạn chỉ cần tự bấm `Cmd + V`.
+Without this permission the app still works: it copies the item you select to the clipboard, and you just press `Cmd + V` yourself.
 
-## Cách dùng
+## How to use
 
-1. Copy vài thứ như bình thường (`Cmd + C`).
-2. Nhấn **`Option + V`** để mở bảng lịch sử.
-3. Dùng `↑` `↓` chọn mục cần, nhấn `Enter` (hoặc bấm chuột) để dán lại.
-4. `Esc` để đóng bảng mà không dán.
+1. Copy things as usual (`Cmd + C`).
+2. Press **`Option + V`** to open the history panel.
+3. Use `↑` `↓` to select an item, press `Enter` (or click) to paste it back.
+4. `Esc` closes the panel without pasting.
 
-Menu bar còn có: **Mở AquaPaste**, **Xóa lịch sử**, **Thoát**.
+The menu bar also has: **Open AquaPaste**, **Clear History**, **Quit**.
 
-## Dữ liệu lưu ở đâu
+## Where data is stored
 
-Lịch sử lưu tại:
+History is saved at:
 
 ```
 ~/Library/Application Support/AquaPaste/clipboard-history.json
 ```
 
-App giữ tối đa **50 mục gần nhất**. Khi vượt 50, mục cũ nhất bị bỏ, file được ghi đè theo kiểu atomic (an toàn, không sinh file rác). Toàn bộ dữ liệu nằm trên máy bạn, không gửi đi đâu.
+The app keeps up to **50 recent items**. When it exceeds 50, the oldest one is dropped and the file is rewritten atomically (safe, no junk files). All data stays on your machine and is never sent anywhere.
 
-## Tự build từ mã nguồn (cho lập trình viên)
+## Build from source (for developers)
 
-Máy cần **Xcode Command Line Tools** và **Swift 6+**.
+Requires **Xcode Command Line Tools** and **Swift 6+**.
 
 ```bash
-# chạy trực tiếp
+# run directly
 swift run AquaPaste
 
-# hoặc đóng gói thành .app
+# or package into a .app
 chmod +x scripts/build-app.sh
 ./scripts/build-app.sh release
 open dist/AquaPaste.app
 
-# cài vào Applications
+# install into Applications
 chmod +x scripts/install-app.sh
 ./scripts/install-app.sh
 ```
 
-Kiến trúc chính:
+Main architecture:
 
-- `ClipboardStore.swift` — theo dõi pasteboard, lưu/đọc lịch sử, atomic write.
-- `ClipboardHistoryAppDelegate.swift` — vòng đời app, menu bar, điều phối phím tắt và dán.
-- `GlobalHotKeyMonitor.swift` — đăng ký hotkey toàn cục `Option + V` qua Carbon.
-- `ClipboardPanelView.swift` + `LiquidGlassBackground.swift` — giao diện kính mờ và điều hướng bàn phím.
-- `PasteAutomation.swift` — tự bấm `Cmd + V` vào app trước đó qua Accessibility.
+- `ClipboardStore.swift` — watches the pasteboard, saves/loads history, atomic write.
+- `ClipboardHistoryAppDelegate.swift` — app lifecycle, menu bar, hotkey and paste coordination.
+- `GlobalHotKeyMonitor.swift` — registers the global `Option + V` hotkey via Carbon.
+- `ClipboardPanelView.swift` + `LiquidGlassBackground.swift` — the frosted-glass UI and keyboard navigation.
+- `PasteAutomation.swift` — auto-presses `Cmd + V` into the previous app via Accessibility.
+- `Localization.swift` — runtime English/Vietnamese switch based on system language.
 
-## Giấy phép
+## License
 
-MIT License — xem file [LICENSE](LICENSE). Dùng, sửa, chia sẻ tự do.
+MIT License — see [LICENSE](LICENSE). Use, modify, and share freely.

@@ -44,7 +44,7 @@ struct ClipboardItem: Identifiable, Equatable, Codable {
         )
 
         let title = String(normalized.prefix(80))
-        let subtitle = "\(trimmed.count) ký tự"
+        let subtitle = L("\(trimmed.count) characters", "\(trimmed.count) ký tự")
 
         return ClipboardItem(
             id: UUID(),
@@ -73,7 +73,7 @@ struct ClipboardItem: Identifiable, Equatable, Codable {
             id: UUID(),
             kind: .image,
             createdAt: Date(),
-            title: "Hình ảnh",
+            title: L("Image", "Hình ảnh"),
             subtitle: "\(width) x \(height)",
             textContent: nil,
             imageData: imageData,

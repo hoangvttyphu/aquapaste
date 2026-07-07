@@ -48,18 +48,18 @@ final class ClipboardHistoryAppDelegate: NSObject, NSApplicationDelegate {
         }
 
         let menu = NSMenu()
-        let showItem = NSMenuItem(title: "Mở AquaPaste", action: #selector(showPanelFromMenu), keyEquivalent: "v")
+        let showItem = NSMenuItem(title: L("Open AquaPaste", "Mở AquaPaste"), action: #selector(showPanelFromMenu), keyEquivalent: "v")
         showItem.keyEquivalentModifierMask = [.option]
         showItem.target = self
         menu.addItem(showItem)
 
-        let clearItem = NSMenuItem(title: "Xóa lịch sử", action: #selector(clearHistory), keyEquivalent: "")
+        let clearItem = NSMenuItem(title: L("Clear History", "Xóa lịch sử"), action: #selector(clearHistory), keyEquivalent: "")
         clearItem.target = self
         menu.addItem(clearItem)
 
         menu.addItem(.separator())
 
-        let quitItem = NSMenuItem(title: "Thoát", action: #selector(quitApp), keyEquivalent: "q")
+        let quitItem = NSMenuItem(title: L("Quit", "Thoát"), action: #selector(quitApp), keyEquivalent: "q")
         quitItem.target = self
         menu.addItem(quitItem)
 
