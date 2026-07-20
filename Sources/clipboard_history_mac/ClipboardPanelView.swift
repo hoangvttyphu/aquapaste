@@ -242,7 +242,7 @@ private struct ClipboardRowView: View {
 
     @ViewBuilder
     private var preview: some View {
-        if let image = item.imagePreview {
+        if let image = item.thumbnailImage {
             Image(nsImage: image)
                 .resizable()
                 .scaledToFill()

@@ -8,18 +8,34 @@ final class ClipboardStore: ObservableObject {
     private static let appSupportFolder = "AquaPaste"
     private static let legacyAppSupportFolder = "ClipVault"
     private static let persistenceFile = "clipboard-history.json"
+    private static let imagesFolder = "images"
+
+    /// Histories written by builds that inlined uncompressed images could reach
+    /// hundreds of megabytes. Anything past this is set aside instead of being
+    /// decoded into memory on launch.
+    private static let maxHistoryFileBytes = 25 * 1024 * 1024
 
     private let pasteboard = NSPasteboard.general
     let maxItems: Int
     private var timer: Timer?
     private var lastObservedChangeCount: Int
     private let persistenceURL: URL
+    private let imagesDirectory: URL
 
     init(maxItems: Int = 50) {
+        let url = Self.makePersistenceURL()
         self.maxItems = maxItems
-        self.persistenceURL = Self.makePersistenceURL()
-        self.items = Self.loadPersistedItems(from: persistenceURL, limit: maxItems)
+        self.persistenceURL = url
+        self.imagesDirectory = url
+            .deletingLastPathComponent()
+            .appendingPathComponent(Self.imagesFolder, isDirectory: true)
+        self.items = Self.loadPersistedItems(from: url, limit: maxItems)
         self.lastObservedChangeCount = pasteboard.changeCount
+
+        ImageStorage.deleteOrphans(
+            keeping: Set(items.compactMap(\.imageFile)),
+            in: imagesDirectory
+        )
     }
 
     func startMonitoring() {
@@ -36,6 +52,7 @@ final class ClipboardStore: ObservableObject {
     }
 
     func clear() {
+        items.forEach(forget)
         items.removeAll()
         persist()
     }
@@ -49,8 +66,12 @@ final class ClipboardStore: ObservableObject {
                 pasteboard.setString(textContent, forType: .string)
             }
         case .image:
-            if let image = item.imagePreview {
+            // The full-resolution image is only pulled off disk at paste time.
+            if let fileName = item.imageFile,
+               let image = ImageStorage.readImage(named: fileName, in: imagesDirectory) {
                 pasteboard.writeObjects([image])
+            } else if let thumbnail = item.thumbnailImage {
+                pasteboard.writeObjects([thumbnail])
             }
         }
 
@@ -71,24 +92,41 @@ final class ClipboardStore: ObservableObject {
         }
 
         if let image = pasteboard.readObjects(forClasses: [NSImage.self], options: nil)?.first as? NSImage,
-           let item = ClipboardItem.fromImage(image) {
+           let item = ClipboardItem.fromImage(image, imagesDirectory: imagesDirectory) {
             insert(item)
         }
     }
 
     private func insert(_ newItem: ClipboardItem) {
         if items.first?.fingerprint == newItem.fingerprint {
+            // Already at the top. Drop the image file we just wrote.
+            forget(newItem)
             return
         }
 
+        let duplicates = items.filter { $0.fingerprint == newItem.fingerprint }
         items.removeAll { $0.fingerprint == newItem.fingerprint }
+        duplicates.forEach(forget)
+
         items.insert(newItem, at: 0)
 
         if items.count > maxItems {
-            items.removeLast(items.count - maxItems)
+            let overflow = items.count - maxItems
+            let evicted = Array(items.suffix(overflow))
+            items.removeLast(overflow)
+            evicted.forEach(forget)
         }
 
         persist()
+    }
+
+    /// Releases everything an item owns: its cached thumbnail and its image file.
+    private func forget(_ item: ClipboardItem) {
+        ImageStorage.dropCachedThumbnail(id: item.id)
+
+        if let fileName = item.imageFile {
+            ImageStorage.deleteBlob(named: fileName, in: imagesDirectory)
+        }
     }
 
     private func persist() {
@@ -107,10 +145,32 @@ final class ClipboardStore: ObservableObject {
     }
 
     private static func loadPersistedItems(from url: URL, limit: Int) -> [ClipboardItem] {
+        let attributes = try? FileManager.default.attributesOfItem(atPath: url.path)
+        let fileSize = (attributes?[.size] as? NSNumber)?.intValue ?? 0
+
+        if fileSize > maxHistoryFileBytes {
+            // Written by an older build that inlined uncompressed images. Move it
+            // aside rather than pulling hundreds of megabytes into memory.
+            let backup = url
+                .deletingLastPathComponent()
+                .appendingPathComponent("clipboard-history.oversized-backup.json")
+            try? FileManager.default.removeItem(at: backup)
+            try? FileManager.default.moveItem(at: url, to: backup)
+            return []
+        }
+
         do {
             let data = try Data(contentsOf: url)
             let loadedItems = try JSONDecoder().decode([ClipboardItem].self, from: data)
-            return Array(loadedItems.prefix(limit))
+
+            // Image entries written by older builds carried their bitmap inline and
+            // decode with no file and no thumbnail. They can no longer be pasted,
+            // so drop them instead of showing dead rows.
+            let usableItems = loadedItems.filter { item in
+                item.kind == .text || item.imageFile != nil || item.thumbnailData != nil
+            }
+
+            return Array(usableItems.prefix(limit))
         } catch {
             return []
         }

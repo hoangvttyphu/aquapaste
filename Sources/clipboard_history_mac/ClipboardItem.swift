@@ -14,15 +14,20 @@ struct ClipboardItem: Identifiable, Equatable, Codable {
     let title: String
     let subtitle: String
     let textContent: String?
-    let imageData: Data?
+    /// File name of the full-resolution PNG stored on disk. Nil for text items.
+    let imageFile: String?
+    /// Small PNG preview kept in the history file so drawing the panel stays cheap.
+    let thumbnailData: Data?
     let fingerprint: String
 
-    var imagePreview: NSImage? {
-        guard let imageData else {
+    /// Preview shown in the list. Decoded once and cached, never the full-size image.
+    @MainActor
+    var thumbnailImage: NSImage? {
+        guard let thumbnailData else {
             return nil
         }
 
-        return NSImage(data: imageData)
+        return ImageStorage.cachedThumbnail(id: id, data: thumbnailData)
     }
 
     var searchableText: String {
@@ -53,30 +58,45 @@ struct ClipboardItem: Identifiable, Equatable, Codable {
             title: title,
             subtitle: subtitle,
             textContent: trimmed,
-            imageData: nil,
+            imageFile: nil,
+            thumbnailData: nil,
             fingerprint: "text:\(normalized)"
         )
     }
 
-    static func fromImage(_ image: NSImage) -> ClipboardItem? {
-        guard let imageData = image.tiffRepresentation else {
+    /// Compresses the image to PNG, writes it next to the history file, and keeps
+    /// only a small thumbnail in memory.
+    @MainActor
+    static func fromImage(_ image: NSImage, imagesDirectory: URL) -> ClipboardItem? {
+        guard let pngData = ImageStorage.pngData(from: image) else {
             return nil
         }
 
         let width = Int(image.size.width.rounded())
         let height = Int(image.size.height.rounded())
-        let digest = SHA256.hash(data: imageData)
+        let digest = SHA256.hash(data: pngData)
             .map { String(format: "%02x", $0) }
             .joined()
 
+        let id = UUID()
+        let fileName = "\(id.uuidString).png"
+
+        do {
+            try ImageStorage.writeBlob(pngData, named: fileName, in: imagesDirectory)
+        } catch {
+            print("Failed to store clipboard image: \(error)")
+            return nil
+        }
+
         return ClipboardItem(
-            id: UUID(),
+            id: id,
             kind: .image,
             createdAt: Date(),
             title: L("Image", "Hình ảnh"),
             subtitle: "\(width) x \(height)",
             textContent: nil,
-            imageData: imageData,
+            imageFile: fileName,
+            thumbnailData: ImageStorage.thumbnailPNGData(from: image),
             fingerprint: "image:\(digest)"
         )
     }
